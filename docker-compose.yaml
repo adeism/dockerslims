@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  php74:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: slims-php74
+    container_name: slims_php74
+    volumes:
+      - ./slims:/var/www/slims
+    networks:
+      - slims_network
+
+  php80:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: slims-php80
+    container_name: slims_php80
+    volumes:
+      - ./slims:/var/www/slims
+    networks:
+      - slims_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_slims
+    volumes:
+      - ./slims:/var/www/slims
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - php74
+      - php80
+    networks:
+      - slims_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: "Janganlupaberdoa!"  # Password untuk root MySQL
+    ports:
+      - "8080:80"
+    networks:
+      - slims_network
+
+networks:
+  slims_network:
+    driver: bridge
